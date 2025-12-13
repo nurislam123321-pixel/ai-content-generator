@@ -7,7 +7,7 @@ genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 model = genai.GenerativeModel("gemini-pro")
 
 def generate_ai(request):
-    # CORS
+    # CORS preflight
     if request.method == "OPTIONS":
         return ("", 204, {
             "Access-Control-Allow-Origin": "*",
@@ -23,7 +23,7 @@ def generate_ai(request):
     prompt = data.get("prompt") if data else None
 
     if not prompt:
-        return (json.dumps({"error": "No prompt"}), 400, headers)
+        return (json.dumps({"error": "No prompt provided"}), 400, headers)
 
     response = model.generate_content(prompt)
 
