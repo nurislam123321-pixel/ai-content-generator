@@ -1,5 +1,5 @@
 const response = await fetch(
-  "https://us-central1-ai-content-generator-481106.cloudfunctions.net/generate_ai",
+  "https://us-central1-ai-content-generator-481106.cloudfunctions.net/generate-ai",
   {
     method: "POST",
     headers: {
