@@ -1,30 +1,27 @@
 import os
-import json
+from flask import Flask, request, jsonify
 import google.generativeai as genai
 
-genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
+app = Flask(__name__)
 
+genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 model = genai.GenerativeModel("gemini-pro")
 
-def generate_ai(request):
-    # CORS preflight
-    if request.method == "OPTIONS":
-        return ("", 204, {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "POST",
-            "Access-Control-Allow-Headers": "Content-Type"
-        })
-
-    headers = {
-        "Access-Control-Allow-Origin": "*"
-    }
-
-    data = request.get_json(silent=True)
-    prompt = data.get("prompt") if data else None
+@app.route("/", methods=["POST"])
+def generate():
+    data = request.get_json()
+    prompt = data.get("prompt")
 
     if not prompt:
-        return (json.dumps({"error": "No prompt provided"}), 400, headers)
+        return jsonify({"error": "No prompt provided"}), 400
 
     response = model.generate_content(prompt)
+    return jsonify({"result": response.text})
 
-    return (json.dumps({"result": response.text}), 200, headers)
+@app.route("/", methods=["GET"])
+def health():
+    return "OK", 200
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
